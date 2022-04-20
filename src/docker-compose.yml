@@ -1,0 +1,44 @@
+version: '3'
+services:
+  bookstack_apache_db:
+    image: mysql:8.0
+    container_name: bookstack_apache_db
+    environment:
+    - TZ=Asia/Shanghai
+    - MYSQL_ROOT_PASSWORD=secret
+    - MYSQL_DATABASE=bookstackapp
+    - MYSQL_USER=bookstack
+    - MYSQL_PASSWORD=secret
+    volumes:
+    - ${BOOKSTACK_DB_ROOT:-./bookstack_db}/var/lib/mysql:/var/lib/mysql
+    - ${BOOKSTACK_BACKUP:-./bookstack_backup}:/bookstack_backup
+    restart: always
+
+
+  bookstack_apache:
+    image: rayruan/bookstack_apache:latest
+    container_name: bookstack_apache
+    depends_on:
+    - bookstack_apache_db
+    environment:
+    - PUID=1026
+    - PGID=100 
+    - APP_URL=https://bookstack.example.com:4443
+    - ALLOWED_IFRAME_SOURCES="https://*.example.synology.me:4443 https://*.draw.io https://*.diagrams.net https://*.youtube.com https://*.youtube-nocookie.com https://*.vimeo.com"
+    - DRAWIO=https://example.tbone.synology.me:4443/?embed=1&proto=json&spin=1
+    - REVISION_LIMIT=64
+    - DB_HOST=bookstack_apache_db:3306
+    - DB_DATABASE=bookstackapp
+    - DB_USERNAME=bookstack
+    - DB_PASSWORD=secret
+    - APP_LANG=zh_CN
+    - WKHTMLTOPDF=/usr/local/bin/wkhtmltopdf
+    - ALLOW_UNTRUSTED_SERVER_FETCHING=true
+    volumes:
+    - ${BOOKSTACK_ROOT:-./bookstack_app}/public/uploads:/var/www/bookstack/public/uploads
+    - ${BOOKSTACK_ROOT:-./bookstack_app}/storage/uploads:/var/www/bookstack/storage/uploads
+    - ${BOOKSTACK_BACKUP:-./bookstack_backup}:/bookstack_backup
+    ports:
+    - 26875:8080
+    restart: always
+    
