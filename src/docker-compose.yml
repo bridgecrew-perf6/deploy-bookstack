@@ -29,6 +29,7 @@ services:
     - DB_DATABASE=${MYSQL_DATABASE:-bookstackapp}
     - DB_USERNAME=${MYSQL_USER:-bookstack}
     - DB_PASSWORD=${MYSQL_PASSWORD:-password}
+    - SESSION_LIFETIME=${SESSION_LIFETIME:-120}
     - APP_LANG=zh_CN
     - WKHTMLTOPDF=/usr/local/bin/wkhtmltopdf
     - ALLOW_UNTRUSTED_SERVER_FETCHING=true
